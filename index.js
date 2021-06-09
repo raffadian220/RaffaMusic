@@ -50,7 +50,7 @@ i18n.configure({
  */
 client.on("ready", () => {
   console.log(`${client.user.username} ready!`);
-  client.user.setActivity(`Subscribe Raffa Dian | YOUTUBE`, { type: "PLAYING" });
+  client.user.setActivity(`Subscribe Raffa Dian | -help`, { type: "WATCHING" });
 });
 client.on("warn", (info) => console.log(info));
 client.on("error", console.error);
