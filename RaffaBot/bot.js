@@ -18,15 +18,14 @@ module.exports = {
  });
       
       bot.on("message", (message) => {
-      
+      if (message.author.equals(bot.user)) return;
          if (message.content == "Hai") {
             message.channel.send(`Hai bang ${message.author} :)`)
-         };
+         }
          
          else if (message.content == "Bacot" || message.content == "bacot") {
             message.channel.send("NGAJAK GELUD LU BANG " + message.author + " ?!?!?!?!"
-         };
-
+         }
      });
          
    bot.token(process.env.RB_token);
