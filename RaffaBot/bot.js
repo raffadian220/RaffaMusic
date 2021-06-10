@@ -10,7 +10,7 @@ module.exports = {
      bot.user.setPresence({
          game: {
              name: "Raffa Dian | Subscribe now!",
-             type: "WATCHING",
+             type: "STREAMING",
              state: "Subscribe Raffa Dian!",
              url: "https://youtube.com/channel/UCut55YrZ1FqZlB10gXzQw2A"
          },
