@@ -9,8 +9,8 @@ module.exports = {
   console.log(`${bot.user.username} is online on ${bot.guilds.size} servers!`);
      bot.user.setPresence({
          game: {
-             name: ``,
-             type: "",
+             name: "Raffa Dian | Subscribe now!",
+             type: "WATCHING",
            state: `${statuslist[random]}`,
              url: "https://www.twitch.tv/monstercats"
          },
