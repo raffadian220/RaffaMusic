@@ -53,7 +53,7 @@ i18n.configure({
  */
 client.on("ready", () => {
   console.log(`${client.user.username} ready!`);
-  client.user.setActivity(`Subscribe Raffa Dian | -help`, { type: "WATCHING" });
+  client.user.setActivity(`Music Bot by Raffa | -help`, { type: "LISTENING" });
 });
 client.on("warn", (info) => console.log(info));
 client.on("error", console.error);
