@@ -26,6 +26,10 @@ module.exports = {
          else if (message.content == "Bacot" || message.content == "bacot") {
             message.channel.send("NGAJAK GELUD LU BANG " + message.author + " ?!?!?!?!")
          }
+         
+                  else if (message.content == "Badut" || message.content == "badut") {
+            message.channel.send("Lu Yang Badut Bege " + message.author + " ?!?!?!?!")
+         }
      });
          
    bot.login(process.env.RB_token);
