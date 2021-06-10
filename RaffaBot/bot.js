@@ -28,6 +28,6 @@ module.exports = {
          }
      });
          
-   bot.token(process.env.RB_token);
+   bot.login(process.env.RB_token);
    }
 }
