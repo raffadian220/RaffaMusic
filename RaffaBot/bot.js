@@ -11,8 +11,8 @@ module.exports = {
          game: {
              name: "Raffa Dian | Subscribe now!",
              type: "WATCHING",
-           state: `${statuslist[random]}`,
-             url: "https://www.twitch.tv/monstercats"
+        //   state: `${statuslist[random]}`,
+        //   url: "https://www.twitch.tv/monstercats"
          },
      });
  });
