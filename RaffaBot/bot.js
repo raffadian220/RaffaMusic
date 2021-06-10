@@ -1,5 +1,5 @@
 const Discord = require("discord.js");
-const bot = Discord.CLient({disableEveryone: true});
+const bot = Discord.Client({disableEveryone: true});
 const dotenv = require("dotenv");
 dotenv.config();
 
