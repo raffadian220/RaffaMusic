@@ -12,7 +12,7 @@ module.exports = {
              name: "Raffa Dian | Subscribe now!",
              type: "STREAMING",
              state: "Subscribe Raffa Dian!",
-             url: "https://youtube.com/channel/UCut55YrZ1FqZlB10gXzQw2A"
+             url: "https://youtu.be/ymmt39sDdG8"
          },
      });
  });
