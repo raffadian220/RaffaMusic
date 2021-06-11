@@ -30,6 +30,10 @@ module.exports = {
                   else if (message.content == "Badut" || message.content == "badut") {
             message.channel.send("Lu Yang Badut Bege")
          }
+         
+                           else if (message.content == "<3" || message.content == "<3") {
+            message.channel.send(`GABOLEH BUCIN ${message.author} !! `)
+         }
      });
          
    bot.login(process.env.RB_token);
