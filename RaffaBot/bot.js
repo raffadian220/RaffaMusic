@@ -34,6 +34,10 @@ module.exports = {
                            else if (message.content == "<3" || message.content == "<3.") {
             message.channel.send(`GABOLEH BUCIN ${message.author} !! `)
          }
+         
+                                    else if (message.content == "-play" || message.content == "-p") {
+            message.channel.send(`sabar ya bege ${message.author} `)
+         }
      });
          
    bot.login(process.env.RB_token);
