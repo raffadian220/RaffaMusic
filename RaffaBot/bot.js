@@ -31,7 +31,7 @@ module.exports = {
             message.channel.send("Lu Yang Badut Bege")
          }
          
-                           else if (message.content == "<3" || message.content == ":heart:") {
+                           else if (message.content == "<3" || message.content == "<3.") {
             message.channel.send(`GABOLEH BUCIN ${message.author} !! `)
          }
      });
