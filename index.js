@@ -53,7 +53,7 @@ i18n.configure({
  */
 client.on("ready", () => {
   console.log(`${client.user.username} ready!`);
-  client.user.setActivity(`KONTOL | -help`, { type: "LISTENING" });
+  client.user.setActivity(`-play | -help`, { type: "LISTENING" });
 });
 client.on("warn", (info) => console.log(info));
 client.on("error", console.error);
