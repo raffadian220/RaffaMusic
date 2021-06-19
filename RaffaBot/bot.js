@@ -36,7 +36,7 @@ module.exports = {
          }
          
                                     else if (message.content == "ara ara" || message.content == "Ara Ara") {
-            message.channel.send(`,ban ${message.author} JANGAN NGOMONG ARA ARA`)
+            message.channel.send(`,ban ${message.author} `)
          }
      });
          
