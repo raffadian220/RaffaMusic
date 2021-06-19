@@ -35,8 +35,8 @@ module.exports = {
             message.channel.send(`GABOLEH BUCIN ${message.author} !! `)
          }
          
-                                    else if (message.content == "-play" || message.content == "-p") {
-            message.channel.send(`sabar ya bege ${message.author} `)
+                                    else if (message.content == "ara ara" || message.content == "Ara Ara") {
+            message.channel.send(`,ban ${message.author} JANGAN NGOMONG ARA ARA`)
          }
      });
          
