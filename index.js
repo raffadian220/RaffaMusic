@@ -53,7 +53,7 @@ i18n.configure({
  */
 client.on("ready", () => {
   console.log(`${client.user.username} ready!`);
-  client.user.setActivity(`RaffaMusic | -help`, { type: "LISTENING" });
+  client.user.setActivity(`Subscribe Raffa Dian! | -help`, { type: "STREAMING" });
 });
 client.on("warn", (info) => console.log(info));
 client.on("error", console.error);
