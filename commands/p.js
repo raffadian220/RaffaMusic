@@ -1,147 +1,142 @@
-const ytdl = require("discord-ytdl-core");
-const youtubeScraper = require("yt-search");
-const yt = require("ytdl-core");
-const { MessageEmbed, Util } = require("discord.js");
-const forHumans = require("../utils/forhumans.js");
+const { play } = require("../include/play");
+const ytdl = require("ytdl-core");
+const YouTubeAPI = require("simple-youtube-api");
+const scdl = require("soundcloud-downloader").default
+const https = require("https");
+const { YOUTUBE_API_KEY, SOUNDCLOUD_CLIENT_ID, LOCALE, DEFAULT_VOLUME } = require("../util/EvobotUtil");
+const youtube = new YouTubeAPI(YOUTUBE_API_KEY);
+const i18n = require("i18n");
 
-exports.run = async (client, message, args) => {
-  const channel = message.member.voice.channel;
+i18n.setLocale(LOCALE);
 
-  const error = (err) => message.channel.send(err);
-  const send = (content) => message.channel.send(content);
-  const setqueue = (id, obj) => message.client.queue.set(id, obj);
-  const deletequeue = (id) => message.client.queue.delete(id);
-  var song;
+module.exports = {
+  name: "play",
+  cooldown: 3,
+  aliases: ["p"],
+  description: i18n.__("play.description"),
+  async execute(message, args) {
+    const { channel } = message.member.voice;
 
-  if (!channel) return error("Kamu Harus Join Voice Kalau Mau Denger Music!");
+    const serverQueue = message.client.queue.get(message.guild.id);
+    if (!channel) return message.reply(i18n.__("play.errorNotChannel")).catch(console.error);
+    if (serverQueue && channel !== message.guild.me.voice.channel)
+      return message
+        .reply(i18n.__mf("play.errorNotInSameChannel", { user: message.client.user }))
+        .catch(console.error);
 
-  if (!channel.permissionsFor(message.client.user).has("CONNECT"))
-    return error("Aku Gaada Permission");
+    if (!args.length)
+      return message
+        .reply(i18n.__mf("play.usageReply", { prefix: message.client.prefix }))
+        .catch(console.error);
 
-  if (!channel.permissionsFor(message.client.user).has("SPEAK"))
-    return error("Aku Gaada Permission");
+    const permissions = channel.permissionsFor(message.client.user);
+    if (!permissions.has("CONNECT")) return message.reply(i18n.__("play.missingPermissionConnect"));
+    if (!permissions.has("SPEAK")) return message.reply(i18n.__("play.missingPermissionSpeak"));
 
-  const query = args.join(" ");
+    const search = args.join(" ");
+    const videoPattern = /^(https?:\/\/)?(www\.)?(m\.)?(youtube\.com|youtu\.?be)\/.+$/gi;
+    const playlistPattern = /^.*(list=)([^#\&\?]*).*/gi;
+    const scRegex = /^https?:\/\/(soundcloud\.com)\/(.*)$/;
+    const mobileScRegex = /^https?:\/\/(soundcloud\.app\.goo\.gl)\/(.*)$/;
+    const url = args[0];
+    const urlValid = videoPattern.test(args[0]);
 
-  if (!query) return error("Judul Lagunya Apa Sayang :)");
-
-  if (query.includes("www.youtube.com")) {
-    try {
-      const ytdata = await await yt.getBasicInfo(query);
-      if (!ytdata) return error("Judul Lagunya Apa Sayang :)");
-      song = {
-        name: Util.escapeMarkdown(ytdata.videoDetails.title),
-        thumbnail:
-          ytdata.player_response.videoDetails.thumbnail.thumbnails[0].url,
-        requested: message.author,
-        videoId: ytdata.videoDetails.videoId,
-        duration: forHumans(ytdata.videoDetails.lengthSeconds),
-        url: ytdata.videoDetails.video_url,
-        views: ytdata.videoDetails.viewCount,
-      };
-    } catch (e) {
-      console.log(e);
-      return error("Error occured, please check console");
+    // Start the playlist if playlist url was provided
+    if (!videoPattern.test(args[0]) && playlistPattern.test(args[0])) {
+      return message.client.commands.get("playlist").execute(message, args);
+    } else if (scdl.isValidUrl(url) && url.includes("/sets/")) {
+      return message.client.commands.get("playlist").execute(message, args);
     }
-  } else {
-    try {
-      const fetched = await (await youtubeScraper(query)).videos;
-      if (fetched.length === 0 || !fetched)
-        return error("Musicnya Gak Ketemu!'");
-      const data = fetched[0];
-      song = {
-        name: Util.escapeMarkdown(data.title),
-        thumbnail: data.image,
-        requested: message.author,
-        videoId: data.videoId,
-        duration: data.duration.toString(),
-        url: data.url,
-        views: data.views,
-      };
-    } catch (err) {
-      console.log(err);
-      return error("An error occured, Please check console");
-    }
-  }
 
-  var list = message.client.queue.get(message.guild.id);
-
-  if (list) {
-    list.queue.push(song);
-    return send(
-      new MessageEmbed()
-        .setAuthor(
-          "The song has been added to the queue",
-          "https://tenor.com/view/genshin-impact-paimon-gif-18658050.gif"
-        )
-        .setColor("F93CCA")
-        .setThumbnail(song.thumbnail)
-        .addField("Song Name", song.name, false)
-        .addField("Requested By", song.requested.tag, false)
-        .setFooter("Positioned " + list.queue.length + " In the queue")
-    );
-  }
-
-  const structure = {
-    channel: message.channel,
-    vc: channel,
-    volume: 100,
-    playing: true,
-    queue: [],
-    connection: null,
-  };
-
-  setqueue(message.guild.id, structure);
-  structure.queue.push(song);
-
-  try {
-    const join = await channel.join();
-    structure.connection = join;
-    play(structure.queue[0]);
-  } catch (e) {
-    console.log(e);
-    deletequeue(message.guild.id);
-    return error("I couldn't join the voice channel, Please check console");
-  }
-
-  async function play(track) {
-    try {
-      const data = message.client.queue.get(message.guild.id);
-      if (!track) {
-        data.channel.send("Queue is empty, Leaving voice channel");
-        message.guild.me.voice.channel.leave();
-        return deletequeue(message.guild.id);
-      }
-      data.connection.on("disconnect", () => deletequeue(message.guild.id));
-      const source = await ytdl(track.url, {
-        filter: "audioonly",
-        quality: "highestaudio",
-        highWaterMark: 1 << 25,
-        opusEncoded: true,
-      });
-      const player = data.connection
-        .play(source, { type: "opus" })
-        .on("finish", () => {
-          var removed = data.queue.shift();
-          if(data.loop == true){
-            data.queue.push(removed)
+    if (mobileScRegex.test(url)) {
+      try {
+        https.get(url, function (res) {
+          if (res.statusCode == "302") {
+            return message.client.commands.get("play").execute(message, [res.headers.location]);
+          } else {
+            return message.reply("No content could be found at that url.").catch(console.error);
           }
-          play(data.queue[0]);
         });
-      player.setVolumeLogarithmic(data.volume / 100);
-      data.channel.send(
-        new MessageEmbed()
-          .setAuthor(
-            "Started Playing",
-          )
-          .setColor("9D5CFF")
-          .setThumbnail(track.thumbnail)
-          .addField("Song Name", track.name, false)
-         .addField("Requested By", track.requested, false)
+      } catch (error) {
+        console.error(error);
+        return message.reply(error.message).catch(console.error);
+      }
+      return message.reply("Following url redirection...").catch(console.error);
+    }
 
-      );
-    } catch (e) {
-      console.error(e);
+    const queueConstruct = {
+      textChannel: message.channel,
+      channel,
+      connection: null,
+      songs: [],
+      loop: false,
+      volume: DEFAULT_VOLUME || 100,
+      playing: true
+    };
+
+    let songInfo = null;
+    let song = null;
+
+    if (urlValid) {
+      try {
+        songInfo = await ytdl.getInfo(url);
+        song = {
+          title: songInfo.videoDetails.title,
+        };
+      } catch (error) {
+        console.error(error);
+        return message.reply(error.message).catch(console.error);
+      }
+    } else if (scRegex.test(url)) {
+      try {
+        const trackInfo = await scdl.getInfo(url, SOUNDCLOUD_CLIENT_ID);
+        song = {
+          title: trackInfo.title,
+          url: trackInfo.permalink_url,
+          duration: Math.ceil(trackInfo.duration / 1000)
+        };
+      } catch (error) {
+        console.error(error);
+        return message.reply(error.message).catch(console.error);
+      }
+    } else {
+      try {
+        const results = await youtube.searchVideos(search, 1, { part: "snippet" });
+        // PATCH 1 : avoid cases when there are nothing on the search results.
+        if (results.length <= 0) {
+          // No video results.
+          message.reply(i18n.__mf("play.songNotFound")).catch(console.error);
+          return;
+        }
+        songInfo = await ytdl.getInfo(results[0].url);
+        song = {
+          title: songInfo.videoDetails.title,
+        };
+      } catch (error) {
+        console.error(error);
+        return message.reply(error.message).catch(console.error);
+      }
+    }
+
+    if (serverQueue) {
+      serverQueue.songs.push(song);
+      return serverQueue.textChannel
+        .send(i18n.__mf("play.queueAdded", { title: song.title, author: message.author }))
+        .catch(console.error);
+    }
+
+    queueConstruct.songs.push(song);
+    message.client.queue.set(message.guild.id, queueConstruct);
+
+    try {
+      queueConstruct.connection = await channel.join();
+      await queueConstruct.connection.voice.setSelfDeaf(true);
+      play(queueConstruct.songs[0], message);
+    } catch (error) {
+      console.error(error);
+      message.client.queue.delete(message.guild.id);
+      await channel.leave();
+      return message.channel.send(i18n.__('play.cantJoinChannel', {error: error})).catch(console.error);
     }
   }
 };

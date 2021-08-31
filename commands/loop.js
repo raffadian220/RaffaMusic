@@ -1,26 +1,21 @@
-const { MessageEmbed } = require("discord.js");
+const { canModifyQueue, LOCALE } = require("../util/EvobotUtil");
+const i18n = require("i18n");
 
-exports.run = async (client, message) => {
-  const queue = message.client.queue.get(message.guild.id);
+i18n.setLocale(LOCALE);
 
-  if (!queue)
-    return message.channel.send(
-      ":x: There are no songs playing in this server"
-    );
+module.exports = {
+  name: "loop",
+  aliases: ["l"],
+  description: i18n.__("loop.description"),
+  execute(message) {
+    const queue = message.client.queue.get(message.guild.id);
+    if (!queue) return message.reply(i18n.__("loop.errorNotQueue")).catch(console.error);
+    if (!canModifyQueue(message.member)) return i18n.__("common.errorNotChannel");
 
-  queue.loop = !queue.loop;
-  message.channel.send(
-    new MessageEmbed()
-      .setAuthor(
-        "Master Loop Contrller",
-        "https://img.icons8.com/color/2x/refresh--v2.gif"
-      )
-      .setColor("BLUE")
-      .setTimestamp()
-      .setDescription(
-        "**Loop is" +
-          (queue.loop == true ? " Enabled " : " Disabled ") +
-        "for current song :white_check_mark: **"
-      )
-  );
+    // toggle from false to true and reverse
+    queue.loop = !queue.loop;
+    return queue.textChannel
+      .send(i18n.__mf("loop.result", { loop: queue.loop ? i18n.__("common.on") : i18n.__("common.off") }))
+      .catch(console.error);
+  }
 };

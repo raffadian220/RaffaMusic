@@ -1,32 +1,35 @@
 const { MessageEmbed } = require("discord.js");
 const lyricsFinder = require("lyrics-finder");
+const { LOCALE } = require("../util/EvobotUtil");
+const i18n = require("i18n");
 
-exports.run = async (client, message, args) => {
-  const queue = message.client.queue.get(message.guild.id);
-  if (!queue)
-    return message.channel
-      .send("There is nothing playing.")
-      .catch(console.error);
+i18n.setLocale(LOCALE);
 
-  let lyrics = null;
+module.exports = {
+  name: "lyrics",
+  aliases: ["ly"],
+  description: i18n.__("lyrics.description"),
+  async execute(message) {
+    const queue = message.client.queue.get(message.guild.id);
+    if (!queue) return message.channel.send(i18n.__("lyrics.errorNotQueue")).catch(console.error);
 
-  try {
-    lyrics = await lyricsFinder(queue.queue[0].name, "");
-    if (!lyrics) lyrics = `No lyrics found for ${queue.queue[0].name} :x:`;
-  } catch (error) {
-    lyrics = `No lyrics found for ${queue.queue[0].name} :x:`;
+    let lyrics = null;
+    const title = queue.songs[0].title;
+    try {
+      lyrics = await lyricsFinder(queue.songs[0].title, "");
+      if (!lyrics) lyrics = i18n.__mf("lyrics.lyricsNotFound", { title: title });
+    } catch (error) {
+      lyrics = i18n.__mf("lyrics.lyricsNotFound", { title: title });
+    }
+
+    let lyricsEmbed = new MessageEmbed()
+      .setTitle(i18n.__mf("lyrics.embedTitle", { title: title }))
+      .setDescription(lyrics)
+      .setColor("#F8AA2A")
+      .setTimestamp();
+
+    if (lyricsEmbed.description.length >= 2048)
+      lyricsEmbed.description = `${lyricsEmbed.description.substr(0, 2045)}...`;
+    return message.channel.send(lyricsEmbed).catch(console.error);
   }
-
-  let lyricsEmbed = new MessageEmbed()
-    .setAuthor(
-      `Lyrics For ${queue.queue[0].name}`,
-      "https://img.icons8.com/color/2x/task--v2.gif"
-    )
-    .setDescription(lyrics)
-    .setColor("BLUE")
-    .setTimestamp();
-
-  if (lyricsEmbed.description.length >= 2048)
-    lyricsEmbed.description = `${lyricsEmbed.description.substr(0, 2045)}...`;
-  return message.channel.send(lyricsEmbed).catch(console.error);
 };

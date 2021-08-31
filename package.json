@@ -1,27 +1,30 @@
 {
-  "name": "discordjs-musicbot",
-  "version": "2.0.0",
-  "description": "Most Advanced open-source discord music bot, Made by NithishPravin",
+  "name": "evobot",
+  "version": "0.10.0",
+  "description": "Discord music bot built with discord.js",
   "main": "index.js",
-  "license": "MIT",
-  "scripts": {
-    "start": "node index.js"
-  },
+  "author": "Erit Islami <eritislami@gmail.com>",
+  "private": true,
+  "homepage": "https://github.com/eritislami/evobot",
+  "repository": "github:eritislami/evobot",
+  "bugs": "https://github.com/eritislami/evobot/issues",
   "engines": {
-    "node": "14.x"
+    "node": ">=14.0.0"
   },
   "dependencies": {
-    "@discordjs/opus": "^0.3.2",
-    "discord-ytdl-core": "^5.0.1",
-    "discord.js": "^12.3.1",
-    "dotenv": "^8.2.0",
-    "ffmpeg": "0.0.4",
-    "ffmpeg-static": "^4.2.7",
-    "fs": "0.0.1-security",
-    "lyrics-finder": "^21.4.0",
-    "node-opus": "^0.3.3",
-    "opusscript": "^0.0.7",
-    "yt-search": "^2.2.4",
-    "ytdl-core": "^4.1.1"
+    "@discordjs/opus": "^0.5.0",
+    "array-move": "^3.0.1",
+    "discord.js": "^12.5.1",
+    "ffmpeg-static": "^4.2.3",
+    "i18n": "^0.13.2",
+    "lyrics-finder": "^21.0.5",
+    "simple-youtube-api": "^5.1.1",
+    "soundcloud-downloader": "^0.2.3",
+    "string-progressbar": "^1.0.3",
+    "ytdl-core": "^4.4.5",
+    "ytdl-core-discord": "^1.2.5"
+  },
+  "scripts": {
+    "start": "node index.js"
   }
 }

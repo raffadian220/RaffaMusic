@@ -1,37 +1,31 @@
 const { MessageEmbed } = require("discord.js");
+const { LOCALE } = require("../util/EvobotUtil");
+const i18n = require("i18n");
 
-exports.run = async (client, message) => {
-  const commands = `connect\`\` - join the voice channel you are in
-   dc\`\` - leave the voice channel you are in
-   p <Song Name or url>\`\` - play songs from youtube
-   pause\`\` - pause currently playing songs in the server
-   resume\`\` - resume paused songs in the server
-   queue\`\` - shows the song queue of the server
-   n\`\` - skips to next song in the queue
-   skipto <Target number>\`\` - Multiple skips until target
-   stop\`\` - stops the song and clears the queue
-   v <volume count or none>\`\` - see or adjust volume of songs
-   np\`\` - see now playing song
-   lyrics\`\` - get lyrics of current song
-   shuffle\`\` - shuffle and randomize the queue
-   invite\`\` - get invite link for the bot
-   loop\`\` - enable / disable loop for the currently playing song
-   remove <Target number>\`\` - remove a song from the queue
-   help\`\` - to see this command`;
+i18n.setLocale(LOCALE);
 
-  const revised = commands
-    .split("\n")
-    .map((x) => "• " + "``" + client.config.prefix + x.trim())
-    .join("\n");
+module.exports = {
+  name: "help",
+  aliases: ["h"],
+  description: i18n.__("help.description"),
+  execute(message) {
+    let commands = message.client.commands.array();
 
-  message.channel.send(
-    new MessageEmbed()
-      .setAuthor(
-        "Raffa Music Commands",
-        "https://tenor.com/view/genshin-impact-paimon-gif-18658050.gif"
-      )
-      .setColor("FFFBFB")
-      .setTimestamp()
-      .setDescription(revised)
-  );
+    let helpEmbed = new MessageEmbed()
+      .setTitle(i18n.__mf("help.embedTitle", { botname: message.client.user.username }))
+      .setDescription(i18n.__("help.embedDescription"))
+      .setColor("#F8AA2A");
+
+    commands.forEach((cmd) => {
+      helpEmbed.addField(
+        `**${message.client.prefix}${cmd.name} ${cmd.aliases ? `(${cmd.aliases})` : ""}**`,
+        `${cmd.description}`,
+        true
+      );
+    });
+
+    helpEmbed.setTimestamp();
+
+    return message.channel.send(helpEmbed).catch(console.error);
+  }
 };

@@ -1,23 +1,19 @@
-const { MessageEmbed } = require("discord.js");
+const { canModifyQueue, LOCALE } = require("../util/EvobotUtil");
+const i18n = require("i18n");
 
-exports.run = async (client, message) => {
-  const channel = message.member.voice.channel;
-  if (!channel)
-    return message.channel.send(
-      "You must Join a voice channel before using this command!"
-    );
-  let queue = message.client.queue.get(message.guild.id);
-  if (!queue)
-    return message.channel.send(
-      new MessageEmbed()
-        .setDescription(":x: There are no songs playing in this server")
-        .setColor("RED")
-    );
-  queue.connection.dispatcher.end();
-  queue.queue = [];
-  return message.channel.send(
-    new MessageEmbed()
-      .setDescription("**Music Berenti :white_check_mark: **")
-      .setColor("BLUE")
-  );
+i18n.setLocale(LOCALE);
+
+module.exports = {
+  name: "stop",
+  description: i18n.__('stop.description'),
+  execute(message) {
+    const queue = message.client.queue.get(message.guild.id);
+
+    if (!queue) return message.reply(i18n.__("stop.errorNotQueue")).catch(console.error);
+    if (!canModifyQueue(message.member)) return i18n.__("common.errorNotChannel");
+
+    queue.songs = [];
+    queue.connection.dispatcher.end();
+    queue.textChannel.send(i18n.__mf("stop.result", { author: message.author })).catch(console.error);
+  }
 };
