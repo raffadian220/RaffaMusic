@@ -13,11 +13,10 @@ exports.run = async (client, message) => {
         .setDescription(":x: There are no songs playing in this server")
         .setColor("RED")
     );
-  queue.connection.dispatcher.end();
-  queue.queue = [];
+  queue.connection.dispatcher.end('skipped');
   return message.channel.send(
     new MessageEmbed()
-      .setDescription("**Music Berenti :white_check_mark: **")
+      .setDescription("**Skip Musicnya :white_check_mark: **")
       .setColor("BLUE")
   );
 };

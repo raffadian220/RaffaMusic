@@ -1,17 +1,21 @@
-const { LOCALE } = require("../util/EvobotUtil");
-const i18n = require("i18n");
+const { MessageEmbed } = require("discord.js");
 
-i18n.setLocale(LOCALE);
-
-module.exports = {
-  name: "invite",
-  description: i18n.__('invite.description'),
-  execute(message) {
-    return message.member
-      .send(
-        `https://discord.com/oauth2/authorize?client_id=${message.client.user.id}&permissions=70282305&scope=bot
-    `
+exports.run = async (client, message) => {
+  message.channel.send(
+    new MessageEmbed()
+      .setAuthor(
+        "Invite Me",
+        "https://img.icons8.com/ultraviolet/2x/email-open--v2.gif"
       )
-      .catch(console.error);
-  }
+      .setColor("BLUE")
+      .setTimestamp()
+      .setDescription(
+        "https://discord.com/oauth2/authorize?client_id=" +
+          client.user.id +
+          "&permissions=" +
+          "37080128" +
+          "&scope=" +
+          "bot"
+      )
+  );
 };

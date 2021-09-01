@@ -1,39 +1,58 @@
-const { canModifyQueue, LOCALE } = require("../util/EvobotUtil");
-const i18n = require("i18n");
+const { MessageEmbed } = require("discord.js");
 
-i18n.setLocale(LOCALE);
+exports.run = async (client, message, args) => {
+  const channel = message.member.voice.channel;
+  if (!channel)
+    return message.channel.send(
+      "You must Join a voice channel before using this command!"
+    );
+  let queue = message.client.queue.get(message.guild.id);
+  if (!queue)
+    return message.channel.send(
+      new MessageEmbed()
+        .setDescription(":x: There are no songs playing in this server")
+        .setColor("RED")
+    );
+  if (!args[0])
+    return message.channel.send(
+      new MessageEmbed()
+        .setDescription("**You must specify the number to skip** :x:")
+        .setColor("RED")
+    );
+  if (isNaN(args[0]))
+    return message.channel.send(
+      new MessageEmbed()
+        .setDescription("**Value must be a number** :x:")
+        .setColor("RED")
+    );
+  queue.playing = !false;
 
-module.exports = {
-  name: "skipto",
-  aliases: ["st"],
-  description: i18n.__("skipto.description"),
-  execute(message, args) {
-    if (!args.length || isNaN(args[0]))
-      return message
-        .reply(i18n.__mf("skipto.usageReply", { prefix: message.client.prefix, name: module.exports.name }))
-        .catch(console.error);
-
-    const queue = message.client.queue.get(message.guild.id);
-    if (!queue) return message.channel.send(i18n.__("skipto.errorNotQueue")).catch(console.error);
-    if (!canModifyQueue(message.member)) return i18n.__("common.errorNotChannel");
-    if (args[0] > queue.songs.length)
-      return message
-        .reply(i18n.__mf("skipto.errorNotValid", { length: queue.songs.length }))
-        .catch(console.error);
-
-    queue.playing = true;
-
-    if (queue.loop) {
-      for (let i = 0; i < args[0] - 2; i++) {
-        queue.songs.push(queue.songs.shift());
-      }
-    } else {
-      queue.songs = queue.songs.slice(args[0] - 2);
+  if (queue.loop) {
+    for (let i = 0; i < parseInt(args[0]) - (1 + 1); i++) {
+      var delta = queue.queue.shift();
+      queue.queue.push(delta);
     }
-
-    queue.connection.dispatcher.end();
-    queue.textChannel
-      .send(i18n.__mf("skipto.result", { author: message.author, arg: args[0] - 1 }))
-      .catch(console.error);
+  } else {
+    queue.queue = queue.queue.slice(parseInt(args[0]) - (1 + 1));
   }
+
+  try {
+    queue.connection.dispatcher.end();
+  } catch (e) {
+    console.log(e);
+    message.client.queue.delete(message.guild.id);
+    queue.vc.leave();
+  }
+
+  return message.channel.send(
+    new MessageEmbed()
+      .setDescription(
+        "**Skipped the music to" +
+          " `" +
+          args[0] +
+          "` " +
+          ":white_check_mark:**"
+      )
+      .setColor("BLUE")
+  );
 };

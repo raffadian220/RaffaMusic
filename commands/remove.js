@@ -1,47 +1,60 @@
-const { canModifyQueue, LOCALE } = require("../util/EvobotUtil");
-const i18n = require("i18n");
-i18n.setLocale(LOCALE);
+const { MessageEmbed } = require("discord.js");
 
-const pattern = /^[0-9]{1,2}(\s*,\s*[0-9]{1,2})*$/;
-
-module.exports = {
-  name: "remove",
-  aliases: ["rm"],
-  description: i18n.__("remove.description"),
-  execute(message, args) {
-    const queue = message.client.queue.get(message.guild.id);
-
-    if (!queue) return message.channel.send(i18n.__("remove.errorNotQueue")).catch(console.error);
-    if (!canModifyQueue(message.member)) return i18n.__("common.errorNotChannel");
-    if (!args.length) return message.reply(i18n.__mf("remove.usageReply", { prefix: message.client.prefix }));
-
-    const arguments = args.join("");
-    const songs = arguments.split(",").map((arg) => parseInt(arg));
-    let removed = [];
-
-    if (pattern.test(arguments)) {
-      queue.songs = queue.songs.filter((item, index) => {
-        if (songs.find((songIndex) => songIndex - 1 === index)) removed.push(item);
-        else return true;
-      });
-
-      queue.textChannel.send(
-        i18n.__mf("remove.result", {
-          title: removed.map((song) => song.title).join("\n"),
-          author: message.author.id
-        })
-      );
-    } else if (!isNaN(args[0]) && args[0] >= 1 && args[0] <= queue.songs.length) {
-      console.log("we got elsed!");
-      return queue.textChannel.send(
-        i18n.__mf("remove.result", {
-          title: queue.songs.splice(args[0] - 1, 1)[0].title,
-          author: message.author.id
-        })
-      );
-    } else {
-      console.log("we got the last one");
-      return message.reply(i18n.__mf("remove.usageReply", { prefix: message.client.prefix }));
-    }
-  }
+exports.run = async (client, message, args) => {
+  const channel = message.member.voice.channel;
+  if (!channel)
+    return message.channel.send(
+      "You must Join a voice channel before using this command!"
+    );
+  if (!args[0])
+    return message.channel.send(
+      new MessageEmbed()
+        .setDescription(":x: No song number provided")
+        .setColor("RED")
+    );
+  if (isNaN(args[0]))
+    return message.channel.send(
+      new MessageEmbed()
+        .setDescription(":x: **Args must be number [Example: -remove 2]**")
+        .setColor("RED")
+    );
+  let queue = message.client.queue.get(message.guild.id);
+  if (args[0] == 1)
+    return message.channel.send(
+      new MessageEmbed()
+        .setDescription(
+          ":x: **Can't remove currently playing song, use command skip**"
+        )
+        .setColor("RED")
+    );
+  if (queue.queue.length == 1)
+    return message.channel.send(
+      new MessageEmbed()
+        .setDescription(
+          ":x: **Can't remove when only one song is playing, Use command stop**"
+        )
+        .setColor("RED")
+    );
+  if (args[0] > queue.queue.length)
+    return message.channel.send(
+      new MessageEmbed()
+        .setDescription(":x: **The queue doesn't have that much songs**")
+        .setColor("RED")
+    );
+  if (!queue)
+    return message.channel.send(
+      new MessageEmbed()
+        .setDescription(":x: **There are no songs playing in this server**")
+        .setColor("RED")
+    );
+  var name = queue.queue[args[0] - 1].name;
+  queue.queue.splice(args[0] - 1);
+  return message.channel.send(
+    new MessageEmbed()
+      .setDescription(
+        "**Removed" + " " + name + " " + "from queue :white_check_mark: **"
+      )
+      .setTimestamp()
+      .setColor("BLUE")
+  );
 };

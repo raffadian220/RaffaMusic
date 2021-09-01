@@ -1,23 +1,38 @@
-const { canModifyQueue, LOCALE } = require("../util/EvobotUtil");
-const i18n = require("i18n");
+const { MessageEmbed } = require("discord.js");
 
-i18n.setLocale(LOCALE);
-
-module.exports = {
-  name: "shuffle",
-  description: i18n.__('shuffle.description'),
-  execute(message) {
-    const queue = message.client.queue.get(message.guild.id);
-    if (!queue) return message.channel.send(i18n.__("shuffle.errorNotQueue")).catch(console.error);
-    if (!canModifyQueue(message.member)) return i18n.__("common.errorNotChannel");
-
-    let songs = queue.songs;
+exports.run = async (client, message, args) => {
+  const channel = message.member.voice.channel;
+  if (!channel)
+    return message.channel.send(
+      "You must Join a voice channel before using this command!"
+    );
+  const queue = message.client.queue.get(message.guild.id);
+  if (!queue)
+    return message.channel.send(
+      new MessageEmbed()
+        .setAuthor(
+          "Master Shuffle Controller Error",
+          "https://img.icons8.com/color/2x/activity.gif"
+        )
+        .setDescription("** :x: There are no songs in queue to shuffle**")
+        .setColor("RED")
+    );
+  let songs = queue.queue;
     for (let i = songs.length - 1; i > 1; i--) {
       let j = 1 + Math.floor(Math.random() * i);
       [songs[i], songs[j]] = [songs[j], songs[i]];
-    }
-    queue.songs = songs;
-    message.client.queue.set(message.guild.id, queue);
-    queue.textChannel.send(i18n.__mf('shuffle.result', {author: message.author})).catch(console.error);
   }
+  queue.queue = songs;
+  message.client.queue.set(message.guild.id, queue);
+  message.channel
+    .send(
+      new MessageEmbed()
+        .setAuthor(
+          "Master Shuffle Controller",
+          "https://img.icons8.com/color/2x/activity.gif"
+        )
+        .setDescription("** :white_check_mark: Shuffled the queue**")
+        .setColor("BLUE")
+    )
+    .catch(console.error);
 };
