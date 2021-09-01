@@ -4,8 +4,8 @@ require("dotenv").config();
 
 const client = new Discord.Client();
 const config = {
-  token: process.ODUxODE3Mjg3MzcxMDYzMzc3.YL9yqw.KE5h3zChD3WNfBe0oydycyhHd58,
-  prefix: process.-,
+  token: "ODUxODE3Mjg3MzcxMDYzMzc3.YL9yqw.KE5h3zChD3WNfBe0oydycyhHd58",
+  prefix: "-"
 };
 client.config = config;
 client.queue = new Map();
@@ -32,4 +32,4 @@ fs.readdir("./commands/", (err, files) => {
   });
 });
 
-client.login(client.config.token);
+client.login(config.token);
