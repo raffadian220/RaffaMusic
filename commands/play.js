@@ -82,6 +82,8 @@ module.exports = {
         songInfo = await ytdl.getInfo(url);
         song = {
           title: songInfo.videoDetails.title,
+          url: songInfo.videoDetails.video_url,
+          duration: songInfo.videoDetails.lengthSeconds
         };
       } catch (error) {
         console.error(error);
@@ -111,6 +113,8 @@ module.exports = {
         songInfo = await ytdl.getInfo(results[0].url);
         song = {
           title: songInfo.videoDetails.title,
+          url: songInfo.videoDetails.video_url,
+          duration: songInfo.videoDetails.lengthSeconds
         };
       } catch (error) {
         console.error(error);

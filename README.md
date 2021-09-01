@@ -46,14 +46,23 @@ Copy or Rename `config.json.example` to `config.json` and fill out the values:
 
 Currently available locales are:
 - English (en)
-- German (de)
-- French (fr)
-- Spanish (es)
-- Turkish (tr)
-- Korean (ko)
+- Arabic (ar)
 - Brazilian Portuguese (pt_br)
+- Dutch (nl)
+- French (fr)
+- German (de)
+- Italian (it)
+- Korean (ko)
+- Polish (pl)
+- Russian (ru)
 - Simplified Chinese (zh_cn)
+- Singaporean Mandarin (zh_sg)
+- Spanish (es)
+- Swedish (sv)
 - Traditional Chinese (zh_tw)
+- Thai (th)
+- Turkish (tr)
+- Vietnamese (vi)
 - Check [Contributing](#-contributing) if you wish to help add more languages!
 
 ## 📝 Features & Commands
@@ -104,7 +113,6 @@ Examples: `1` or `1,2,3`
 * Show api ping (/ping)
 * Show bot uptime (/uptime)
 * Toggle pruning of bot messages (/pruning)
-* Localization in 6 languages
 * Help (/help, /h)
 * Command Handler from [discordjs.guide](https://discordjs.guide/)
 * Media Controls via Reactions
