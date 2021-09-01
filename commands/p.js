@@ -23,12 +23,12 @@ exports.run = async (client, message, args) => {
 
   const query = args.join(" ");
 
-  if (!query) return error("Judul Lagunya Apa Sayang :)");
+  if (!query) return error("Judul Lagunya Apa Sayang (message.author) :)");
 
   if (query.includes("www.youtube.com")) {
     try {
       const ytdata = await await yt.getBasicInfo(query);
-      if (!ytdata) return error("Judul Lagunya Apa Sayang :)");
+      if (!ytdata) return error("Judul Lagunya Apa Sayang (message.author) :)");
       song = {
         name: Util.escapeMarkdown(ytdata.videoDetails.title),
         thumbnail:
